@@ -11,3 +11,8 @@ node_modules/
 *DS_Store*
 .vscode/
 *.bak
+
+test/.classpath
+test/.project
+test/deployment/
+test/javasource/
