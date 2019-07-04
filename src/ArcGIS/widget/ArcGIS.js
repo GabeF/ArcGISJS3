@@ -49,6 +49,8 @@ define([
         templateString: widgetTemplate,
 
         widgetBase: null,
+        allowMultiGeometry: true,
+        drawGraphicsJSON: "",
 
         // Internal variables.
         _handles: null,
@@ -56,14 +58,15 @@ define([
         _map: null,
         _firstRun: true,
 
+        _drawTool: null,
+        _drawObsTool: null,
+
         constructor: function() {
             this._handles = [];
         },
 
         postCreate: function() {
             logger.debug(this.id + ".postCreate");
-
-            this.x = "hi there from postcreate";
 
             // Load a sample base map
             require(ArcGIS_Dojo_Loader_Config, [
@@ -95,7 +98,9 @@ define([
                 "dojo/on",
                 "dojo/dom-class",
                 "dojo/parser",
-                "ArcGIS/config/mapConfig"
+                "ArcGIS/config/mapConfig",
+                "ArcGIS/widget/drawPointTool",
+                "ArcGIS/widget/drawObsTool"
             ], dojo.hitch(this, function(
                 Map,
                 urlUtils,
@@ -125,7 +130,9 @@ define([
                 on,
                 domClass,
                 parser,
-                Map_Config
+                Map_Config,
+                DrawPointTool,
+                DrawObsTool
             ) {
                 // webmap for DSRA DP270
 
@@ -143,12 +150,11 @@ define([
                         var map = response.map;
 
                         this._map = map;
-
                         this._response = response;
 
                         var overviewMapDijit = new OverviewMap({
                             map: map,
-                            attachTo: "top-left",
+                            attachTo: "bottom-right",
                             color: " #D84E13",
                             opacity: 0.4
                         });
@@ -156,7 +162,6 @@ define([
                         overviewMapDijit.startup();
 
                         // set up legend
-
                         var legendLayers = arcgisUtils.getLegendLayers(
                             response
                         );
@@ -207,26 +212,14 @@ define([
                             }
                         );
 
-                        //Activate the toolbar when you click on a graphic
-                        map.graphics.on("click", function(evt) {
-                            event.stop(evt);
-                            activateToolbar(evt.graphic);
-                        });
-
                         //deactivate the toolbar when you click outside a graphic
                         map.on("click", function(evt) {
                             editToolbar.deactivate();
                         });
 
                         function activateToolbar(graphic) {
-                            editToolbar.activate(
-                                0 | Edit.MOVE | Edit.ROTATE | Edit.SCALE,
-                                graphic
-                            );
+                            editToolbar.activate(Edit.EDIT_VERTICES | Edit.MOVE | Edit.ROTATE | Edit.SCALE, graphic);
                         }
-
-                        // shouldn't this be closer to the end?
-                        //this.set("loaded", true);
 
                         //add the scalebar
                         if (true) {
@@ -383,73 +376,30 @@ define([
                         );
                         home.startup();
 
-                        if (this.showDrawTools) {
-                            var el = document.getElementsByClassName(
-                                "drawTools"
-                            )[0];
-                            el.style.display = "block";
-
-                            var toolbar = new Draw(response.map);
-                            this.drawToolbar = toolbar;
-                            toolbar.on("draw-end", addToMap);
-
-                            // wire up the buttons (NEEDS BETTER SELECTOR!)
-                            document
-                                .querySelectorAll("#header button")
-                                .forEach(function(d) {
-                                    d.addEventListener("click", activateTool);
-                                });
-
-                            // check zoom level to tell whether the draw button should be enabled
-                            var mapZoomLevel = this._map.getZoom();
-                            var minZoomForDraw = this.minZoomDrawTools;
-                            if (minZoomForDraw > mapZoomLevel) {
-                                el.disabled = true;
-                                var el2 = document.getElementsByClassName(
-                                    "placePointButton"
-                                )[0];
-
-                                el2.disabled = true;
-                            }
+                        if (this.showDrawTools)
+                        {    
+                            dojoStyle.set("arcgisw_drawTools", "display", this.showDrawTools ? "block" : "none");
+                            this._drawTool = new DrawPointTool({app: this});
                         }
 
-                        // declared loaded after all asynchronous calls in post create have
+                        if (this.showObsDrawTools)
+                        {
+                            dojoStyle.set("arcgisw_drawObsTools", "display", this.showDrawTools ? "block" : "none");
+                            this._drawObsTool = new DrawObsTool({
+                                app: this,
+                                allowMultiGeometry: this.allowMultiGeometry,
+                                drawPoint: this.drawPoint,
+                                drawPolygon: this.drawPolygon,
+                                drawPolyline: this.drawPolyline,
+                                drawFreehandPolygon: this.drawFreehandPolygon,
+                                drawFreehandPolyline: this.drawFreehandPolyline,
+                            });
+                        }
+
+                        // Declared loaded after all asynchronous calls in post create have
                         // been initiated. this is especially important if the object
-                        // is accessed in the update method
-
+                        // is accessed in the update method.
                         this.set("loaded", true);
-
-                        function activateTool() {
-                            var tool = this.textContent
-                                .toUpperCase()
-                                .replace(/ /g, "_");
-                            toolbar.activate(Draw[tool]);
-                            response.map.hideZoomSlider();
-                        }
-
-                        function addToMap(evt) {
-                            var symbol;
-                            toolbar.deactivate();
-                            response.map.showZoomSlider();
-
-                            switch (evt.geometry.type) {
-                                case "point":
-                                case "multipoint":
-                                    symbol = new SimpleMarkerSymbol().setColor(
-                                        new Color("#FFFF00")
-                                    );
-
-                                    break;
-                                case "polyline":
-                                    symbol = new SimpleLineSymbol();
-                                    break;
-                                default:
-                                    symbol = new SimpleFillSymbol();
-                                    break;
-                            }
-                            var graphic = new Graphic(evt.geometry, symbol);
-                            response.map.graphics.add(graphic);
-                        }
                     })
                 );
             }));
@@ -534,39 +484,10 @@ define([
                 }
             }
 
-            this.editToolbar.on(
-                "graphic-move-stop",
-                dojo.hitch(this, function(evt) {
-                    this._contextObj.set(
-                        this.droppedLatitude,
-                        evt.graphic.geometry.getLatitude()
-                    );
-                    this._contextObj.set(
-                        this.droppedLongitude,
-                        evt.graphic.geometry.getLongitude()
-                    );
-                })
-            );
-
-            this.drawToolbar.on(
-                "draw-end",
-                dojo.hitch(this, function(evt) {
-                    this._contextObj.set(
-                        this.droppedLatitude,
-                        evt.geometry.getLatitude()
-                    );
-                    this._contextObj.set(
-                        this.droppedLongitude,
-                        evt.geometry.getLongitude()
-                    );
-                })
-            );
-
             // set zoom level to current zoom level
             this._contextObj.set(this.currentZoomLevel, this._map.getZoom());
 
             // hook up listener to zoom-end event
-
             this._map.on(
                 "zoom-end",
                 dojo.hitch(this, function() {
@@ -577,32 +498,12 @@ define([
 
                     // check zoom level to tell whether the draw button should be enabled
                     var mapZoomLevel = this._map.getZoom();
-                    var minZoomForDraw = this.minZoomDrawTools;
+                    if (this._drawTool != null) {
+                        this._drawTool.enableDrawTools(this.minZoomDrawTools <= mapZoomLevel);
+                    }
 
-                    if (minZoomForDraw > mapZoomLevel) {
-                        var el = document.getElementsByClassName(
-                            "drawTools"
-                        )[0];
-
-                        el.disabled = true;
-
-                        var el2 = document.getElementsByClassName(
-                            "placePointButton"
-                        )[0];
-
-                        el2.disabled = true;
-                    } else {
-                        var el = document.getElementsByClassName(
-                            "drawTools"
-                        )[0];
-
-                        el.disabled = false;
-
-                        var el2 = document.getElementsByClassName(
-                            "placePointButton"
-                        )[0];
-
-                        el2.disabled = false;
+                    if (this._drawObsTool != null) {
+                        this._drawObsTool.enableDrawTools(this.minZoomDrawTools <= mapZoomLevel);
                     }
                 })
             );
@@ -875,7 +776,19 @@ define([
             if (cb && typeof cb === "function") {
                 cb();
             }
-        }
+        },
+
+        _enableMapPopup: function(enable) {
+            if (enable)
+            {
+                this._response.clickEventHandle = dojo.connect(this._map, "onClick", this._response.clickEventListener);
+            }
+            else
+            {
+                dojo.disconnect(this._response.clickEventHandle);
+            }
+        },
+
     });
 });
 

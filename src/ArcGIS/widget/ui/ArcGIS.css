@@ -124,16 +124,22 @@
     background-color: #0595DB;
 }
 
-#map_zoom_slider {
-    left: 10px;
-    margin-top: 200px;
+.widgetname #HomeButton {
+    position: absolute;
+    top: 90px;
+    left: 21px;
+    z-index: 50;
+}
+
+.widgetname #map_zoom_slider {
+    left: 20px;
 }
 
 .widgetname #map {
-    padding-top: 10px;
+    /* padding-top: 10px; */
     margin: 0;
     height: 800px;
-    padding-bottom: 20px;
+    /* padding-bottom: 20px; */
 }
 
 .btn-default {
@@ -152,17 +158,13 @@
     margin-bottom: 5px;
 }
 
-.home {
-    margin-top: 30px;
-}
-
-#mainWindow {
+#arcgisw_drawMainWindow, #arcgisw_drawObsMainWindow {
     /* font-family: sans-serif;*/
     height: 100%;
     width: 100%;
 }
 
-#header {
+#arcgisw_drawHeader, #arcgisw_drawObsHeader {
     height: 120px;
     overflow: auto;
     padding: 0.5em;
