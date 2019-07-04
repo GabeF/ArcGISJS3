@@ -49,7 +49,26 @@ define([
         templateString: widgetTemplate,
 
         widgetBase: null,
+
+        // Draw Point Tool properties from Mendix...
+        drawPointSymbolUrl: "",
+        drawPointSymbolWidth: 24,
+        drawPointSymbolHeight: 24,
+        drawPointOutlineColour: "#000000",
+        drawPointOutlineAlpha: 100,
+        drawPointFillColour: "#000000",
+        drawPointFillAlpha: 25,
+
+        // Observation Tool properties from Mendix...
         allowMultiGeometry: true,
+        drawObsPointSymbolUrl: "",
+        drawObsPointSymbolWidth: 24,
+        drawObsPointSymbolHeight: 24,
+        drawObsOutlineColour: "#000000",
+        drawObsOutlineAlpha: 100,
+        drawObsFillColour: "#000000",
+        drawObsFillAlpha: 25,
+
         drawGraphicsJSON: "",
 
         // Internal variables.
@@ -379,7 +398,16 @@ define([
                         if (this.showDrawTools)
                         {    
                             dojoStyle.set("arcgisw_drawTools", "display", this.showDrawTools ? "block" : "none");
-                            this._drawTool = new DrawPointTool({app: this});
+                            this._drawTool = new DrawPointTool({
+                                app: this,
+                                pointSymbolUrl: this.drawPointSymbolUrl,
+                                pointSymbolWidth: this.drawPointSymbolWidth,
+                                pointSymbolHeight: this.drawPointSymbolHeight,
+                                outlineColour: this.drawPointOutlineColour,
+                                outlineAlpha: this.drawPointOutlineAlpha,
+                                fillColour: this.drawPointFillColour,
+                                fillAlpha: this.drawPointFillAlpha,
+                            });
                         }
 
                         if (this.showObsDrawTools)
@@ -393,6 +421,13 @@ define([
                                 drawPolyline: this.drawPolyline,
                                 drawFreehandPolygon: this.drawFreehandPolygon,
                                 drawFreehandPolyline: this.drawFreehandPolyline,
+                                pointSymbolUrl: this.drawObsPointSymbolUrl,
+                                pointSymbolWidth: this.drawObsPointSymbolWidth,
+                                pointSymbolHeight: this.drawObsPointSymbolHeight,
+                                outlineColour: this.drawObsOutlineColour,
+                                outlineAlpha: this.drawObsOutlineAlpha,
+                                fillColour: this.drawObsFillColour,
+                                fillAlpha: this.drawObsFillAlpha,
                             });
                         }
 

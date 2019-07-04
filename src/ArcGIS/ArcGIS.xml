@@ -111,7 +111,47 @@
         </property>
 
         <!-- Draw Point Tool -->
-        
+        <property key="drawPointSymbolUrl" type="string" required="false" defaultValue="">
+            <caption>Point Symbol URL</caption>
+            <category>Draw Point</category>
+            <description>The symbol URL for to be used as the point symbol.  If none is defined, the outline/fill colours will be used.</description>
+        </property>
+
+        <property key="drawPointSymbolWidth" type="integer" defaultValue="24">
+            <caption>Point Symbol Width</caption>
+            <category>Draw Point</category>
+            <description>The symbol width in pixels.</description>
+        </property>
+
+        <property key="drawPointSymbolHeight" type="integer" defaultValue="24">
+            <caption>Point Symbol Height</caption>
+            <category>Draw Point</category>
+            <description>The symbol height in pixels.</description>
+        </property>
+
+        <property key="drawPointOutlineColour" type="string" required="false" defaultValue="#000000">
+            <caption>Point Outline Colour</caption>
+            <category>Draw Point</category>
+            <description>The colour to be used for the outline of the drawn objects (i.e. #000000).</description>
+        </property>
+
+        <property key="drawPointOutlineAlpha" type="integer" defaultValue="100">
+            <caption>Point Outline Alpha</caption>
+            <category>Draw Point</category>
+            <description>The alpha value to be used for the outline of the drawn objects (0 - 100).</description>
+        </property>
+
+        <property key="drawPointFillColour" type="string" required="false" defaultValue="#000000">
+            <caption>Point Fill Colour</caption>
+            <category>Draw Point</category>
+            <description>The colour to be used for the fill of the drawn objects (i.e. #000000).</description>
+        </property>
+
+        <property key="drawPointFillAlpha" type="integer" defaultValue="25">
+            <caption>Point Fill Alpha</caption>
+            <category>Draw Point</category>
+            <description>The alpha value to be used for the fill of the drawn objects (0 - 100).</description>
+        </property>
 
         <!-- Observation Tool -->
         <property key="allowMultiGeometry" type="boolean" defaultValue="false">
@@ -155,6 +195,48 @@
             <caption>Draw Freehand Polygon</caption>
             <category>Observations</category>
             <description>Allow a freehand polygon to be drawn.</description>
+        </property>
+
+        <property key="drawObsPointSymbolUrl" type="string" required="false" defaultValue="">
+            <caption>Symbol URL</caption>
+            <category>Observations</category>
+            <description>The symbol URL for to be used as the point symbol.  If none is defined, the outline/fill colours will be used.</description>
+        </property>
+
+        <property key="drawObsPointSymbolWidth" type="integer" defaultValue="24">
+            <caption>Symbol Width</caption>
+            <category>Observations</category>
+            <description>The symbol width in pixels.</description>
+        </property>
+
+        <property key="drawObsPointSymbolHeight" type="integer" defaultValue="24">
+            <caption>Symbol Height</caption>
+            <category>Observations</category>
+            <description>The symbol height in pixels.</description>
+        </property>
+
+        <property key="drawObsOutlineColour" type="string" required="false" defaultValue="#000000">
+            <caption>Outline Colour</caption>
+            <category>Observations</category>
+            <description>The colour to be used for the outline of the drawn objects (i.e. #000000).</description>
+        </property>
+
+        <property key="drawObsOutlineAlpha" type="integer" defaultValue="100">
+            <caption>Outline Alpha</caption>
+            <category>Observations</category>
+            <description>The alpha value to be used for the outline of the drawn objects (0 - 100).</description>
+        </property>
+
+        <property key="drawObsFillColour" type="string" required="false" defaultValue="#000000">
+            <caption>Fill Colour</caption>
+            <category>Observations</category>
+            <description>The colour to be used for the fill of the drawn objects (i.e. #000000).</description>
+        </property>
+
+        <property key="drawObsFillAlpha" type="integer" defaultValue="25">
+            <caption>Fill Alpha</caption>
+            <category>Observations</category>
+            <description>The alpha value to be used for the fill of the drawn objects (0 - 100).</description>
         </property>
 
         <property key="drawObsGraphicsJSON" type="attribute" required="false">

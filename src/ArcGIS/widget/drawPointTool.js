@@ -14,8 +14,8 @@ define([
     "esri/Color",
     "esri/graphic",
     "esri/graphicsUtils",
-    "esri/layers/GraphicsLayer", 
-    "esri/symbols/SimpleFillSymbol",
+    "esri/layers/GraphicsLayer",
+    "esri/symbols/SimpleLineSymbol",
     "esri/symbols/SimpleMarkerSymbol",
     "esri/toolbars/draw",
     "esri/toolbars/edit"
@@ -30,7 +30,7 @@ define([
     Graphic,
     graphicsUtils,
     GraphicsLayer,
-    SimpleFillSymbol,
+    SimpleLineSymbol,
     SimpleMarkerSymbol,
     Draw,
     Edit
@@ -41,6 +41,14 @@ define([
         
         app: null,
         allowMultiGeometry: false,
+
+        pointSymbolUrl: "",
+        pointSymbolWidth: 24,
+        pointSymbolHeight: 24,
+        outlineColour: "#000000",
+        outlineAlpha: 100,
+        fillColour: "#000000",
+        fillAlpha: 25,
 
         // Internal variables.
         _map: null,
@@ -134,14 +142,32 @@ define([
             var symbol;
             this._drawToolbar.deactivate();
 
-            switch (evt.geometry.type) {
-                case "point":
-                    symbol = new SimpleMarkerSymbol().setColor(new Color("#FFFF00"));
-                    break;
-                default:
-                    symbol = new SimpleFillSymbol();
-                    break;
+            // Symbolize the graphic...
+            if ( evt.geometry.type === "point" &&
+                 this.pointSymbolUrl.length > 0 )
+            {
+                symbol = new PictureMarkerSymbol();
+                symbol.setUrl(this.pointSymbolUrl);
+                symbol.setWidth(this.pointSymbolWidth);
+                symbol.setHeight(this.pointSymbolHeight);
             }
+            else
+            {
+                // Use the color schemes
+                var colour = new Color(this.fillColour);
+                colour.a = this.fillAlpha / 100;
+                var outlineColour = new Color(this.outlineColour);
+                outlineColour.a = this.outlineAlpha / 100;
+
+                var outline = new SimpleLineSymbol();
+                outline.setColor(outlineColour);
+
+                symbol = new SimpleMarkerSymbol();
+                symbol.setColor(colour);
+                symbol.setOutline(outline);
+                symbol.setSize(this.pointSymbolWidth);
+            }
+
             var graphic = new Graphic(evt.geometry, symbol);
             this._drawLayer.add(graphic);
 
