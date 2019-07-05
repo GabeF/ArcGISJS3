@@ -160,10 +160,16 @@
             <description>Allow multiple geometries to be drawn.</description>
         </property>
 
-        <property key="drawPoint" type="boolean" defaultValue="true">
+        <property key="drawObsPoint" type="boolean" defaultValue="true">
             <caption>Draw Point</caption>
             <category>Observations</category>
             <description>Allow a point to be drawn.</description>
+        </property>
+
+        <property key="drawObsMultiPoint" type="boolean" defaultValue="true">
+            <caption>Draw Multi Point</caption>
+            <category>Observations</category>
+            <description>Allow a multi point to be drawn.</description>
         </property>
 
         <!-- Currently the line is not supported by the backend API. -->
@@ -173,25 +179,25 @@
             <description>Allow a line to be drawn.</description>
         </property> -->
 
-        <property key="drawPolyline" type="boolean" defaultValue="true">
+        <property key="drawObsPolyline" type="boolean" defaultValue="true">
             <caption>Draw Polyline</caption>
             <category>Observations</category>
             <description>Allow a polyline to be drawn.</description>
         </property>
 
-        <property key="drawPolygon" type="boolean" defaultValue="true">
+        <property key="drawObsPolygon" type="boolean" defaultValue="true">
             <caption>Draw Polygon</caption>
             <category>Observations</category>
             <description>Allow a polygon to be drawn.</description>
         </property>
 
-        <property key="drawFreehandPolyline" type="boolean" defaultValue="true">
+        <property key="drawObsFreehandPolyline" type="boolean" defaultValue="true">
             <caption>Draw Freehand Polyline</caption>
             <category>Observations</category>
             <description>Allow a freehand polyline to be drawn.</description>
         </property>
 
-        <property key="drawFreehandPolygon" type="boolean" defaultValue="true">
+        <property key="drawObsFreehandPolygon" type="boolean" defaultValue="true">
             <caption>Draw Freehand Polygon</caption>
             <category>Observations</category>
             <description>Allow a freehand polygon to be drawn.</description>

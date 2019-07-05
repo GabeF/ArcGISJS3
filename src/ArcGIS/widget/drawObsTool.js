@@ -12,8 +12,11 @@ define([
     "dojo/dom-style",
     "dojo/on",
     "esri/Color",
+    "esri/geometry/Multipoint",
+    "esri/geometry/Point",
     "esri/graphic",
-    "esri/layers/GraphicsLayer", 
+    "esri/layers/GraphicsLayer",
+    "esri/SpatialReference",
     "esri/symbols/SimpleFillSymbol",
     "esri/symbols/SimpleLineSymbol",
     "esri/symbols/SimpleMarkerSymbol",
@@ -28,8 +31,11 @@ define([
     dojoStyle,
     on,
     Color,
+    Multipoint,
+    Point,
     Graphic,
     GraphicsLayer,
+    SpatialReference,
     SimpleFillSymbol,
     SimpleLineSymbol,
     SimpleMarkerSymbol,
@@ -44,6 +50,7 @@ define([
         app: null,
         allowMultiGeometry: false,
         drawPoint: false,
+        drawMultiPoint: false,
         drawPolygon: false,
         drawPolyline: false,
         drawFreehandPolygon: false,
@@ -81,8 +88,17 @@ define([
             // wire up the buttons
             var btnElements = document.querySelectorAll("#arcgisw_drawObsHeader button");
             btnElements.forEach( function(d) {
-                on(d, "click",  dojo.hitch(this, this._drawGraphic));
+                if( d.id == "arcgisw_drawObsClearBtn" )
+                {
+                    on(d, "click",  dojo.hitch(this, this._clearGraphics));
+                }
+                else
+                {
+                    on(d, "click",  dojo.hitch(this, this._drawGraphic));
+                }
             }, this);
+
+            //arcgisw_drawObsClearBtn
 
             // Listen to the map click...
             this._map.on("click", dojo.hitch(this, this._onMapClick));
@@ -109,6 +125,11 @@ define([
             if (!this.drawPoint)
             {
                 dojo.destroy("arcgisw_drawObsPointBtn");
+            }
+
+            if (!this.drawMultiPoint)
+            {
+                dojo.destroy("arcgisw_drawObsMultiPointBtn");
             }
 
             if (!this.drawPolyline)
@@ -167,6 +188,10 @@ define([
 
         _editGraphic: function(graphic) {
             this._editToolbar.activate(Edit.EDIT_VERTICES | Edit.MOVE | Edit.ROTATE | Edit.SCALE, graphic);
+        },
+
+        _clearGraphics: function() {
+            this._drawLayer.clear();
         },
 
         _onGraphicMoved: function(evt) {
@@ -241,11 +266,34 @@ define([
         _updateGraphicsJSONValue: function(graphics) {
             var graphicsObject = [];
 
-            graphics.forEach(function(graphic){
-                graphicsObject.push(graphic.toJson());
+            graphics.forEach(function(graphic) {
+                // Is the graphic a point? If so, it needs to be a multipoint for the output.
+                if (graphic.geometry.type == "point")
+                {
+                    var sr = new SpatialReference(graphic.geometry.spatialReference.toJson());
+                    var newPoint = new Point(graphic.geometry.toJson());
+
+                    var multiPoint = new Multipoint(sr);
+                    multiPoint.addPoint(newPoint);
+
+                    graphicsObject.push(multiPoint.toJson());
+                }
+                else
+                {
+                    graphicsObject.push(graphic.geometry.toJson());
+                }
             });
 
-            var graphicsJson = JSON.stringify(graphicsObject);
+            var graphicsJson;
+            if (this.allowMultiGeometry)
+            {
+                graphicsJson = JSON.stringify(graphicsObject);
+            }
+            else
+            {
+                graphicsJson = JSON.stringify(graphicsObject[0]);
+            }
+
             this.app._contextObj.set(this.app.drawObsGraphicsJSON, graphicsJson);
         }
 
